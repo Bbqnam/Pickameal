@@ -1,4 +1,4 @@
-export type Cuisine = "Asian" | "Western" | "Mexican" | "Italian" | "Middle Eastern";
+export type Cuisine = "Asian" | "Western" | "Mexican" | "Italian" | "Middle Eastern" | "Mediterranean";
 export type MealType = "Breakfast" | "Lunch" | "Dinner" | "Snack";
 export type Difficulty = "Easy" | "Medium" | "Hard";
 export type CookingTime = "Under 15 min" | "Under 30 min" | "Under 60 min";
@@ -7,6 +7,8 @@ export type IngredientCategory = "Protein" | "Vegetables" | "Carbs" | "Extras";
 export interface Ingredient {
   name: string;
   category: IngredientCategory;
+  image?: string;
+  secondaryImage?: string;
 }
 
 export interface Recipe {

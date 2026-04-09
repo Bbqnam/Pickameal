@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -110,9 +111,12 @@ export default {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.7" },
         },
-        "float": {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-8px)" },
+        "bounce-around": {
+          "0%": { transform: "translate(0, 0)" },
+          "25%": { transform: "translate(6px, -10px)" },
+          "50%": { transform: "translate(-5px, 8px)" },
+          "75%": { transform: "translate(8px, 4px)" },
+          "100%": { transform: "translate(0, 0)" },
         },
         "shimmer": {
           "0%": { backgroundPosition: "-200% 0" },
@@ -132,9 +136,10 @@ export default {
         "wiggle": "wiggle 0.5s ease-in-out",
         "pulse-soft": "pulse-soft 2s ease-in-out infinite",
         "float": "float 3s ease-in-out infinite",
+        "bounce-around": "bounce-around 3.5s ease-in-out infinite",
         "shimmer": "shimmer 2s linear infinite",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 } satisfies Config;

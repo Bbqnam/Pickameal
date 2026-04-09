@@ -1,0 +1,36 @@
+<svg width="640" height="480" viewBox="0 0 640 480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3d7"/>
+      <stop offset="100%" stop-color="#f9d890"/>
+    </linearGradient>
+    <linearGradient id="can" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f3f3f3"/>
+    </linearGradient>
+    <linearGradient id="lid" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f0f4ff"/>
+      <stop offset="100%" stop-color="#dae1ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="480" fill="url(#bg)" rx="40"/>
+  <rect x="140" y="120" width="360" height="300" rx="40" fill="url(#can)" stroke="#d1d5db" stroke-width="4" filter="drop-shadow(0 15px 20px rgba(0,0,0,0.08))"/>
+  <rect x="180" y="90" width="280" height="60" rx="18" fill="url(#lid)" stroke="#c7d3ff" stroke-width="3"/>
+  <rect x="200" y="180" width="240" height="140" rx="20" fill="#0c3c84"/>
+  <rect x="260" y="220" width="120" height="20" rx="10" fill="#fcd34d"/>
+  <rect x="260" y="260" width="120" height="15" rx="7" fill="#fcd34d"/>
+  <rect x="260" y="300" width="120" height="15" rx="7" fill="#fcd34d"/>
+  <path d="M 240 190 h -30 v 120 h 30 z" fill="#fcd34d"/>
+  <path d="M 400 190 h 30 v 120 h -30 z" fill="#fcd34d"/>
+  <rect x="200" y="340" width="240" height="50" rx="24" fill="#e5e7eb"/>
+  <text x="320" y="230" font-family="Inter" font-size="36" font-weight="700" fill="#fef9c3" text-anchor="middle">Matlagningsgrädde</text>
+  <text x="320" y="270" font-family="Inter" font-size="18" font-weight="600" fill="#fde68a" text-anchor="middle">10–15 % fett</text>
+  <rect x="320" y="320" width="180" height="40" rx="14" fill="#0050a2"/>
+  <path d="M 340 330 h 10 v 10 h 10 v -10 h 10 v -10 h -10 v -10 h -10 v 10 h -10 z" fill="#fcd34d"/>
+  <rect x="360" y="330" width="10" height="30" fill="#fcd34d"/>
+  <rect x="360" y="330" width="30" height="10" fill="#fcd34d"/>
+  <rect x="320" y="380" width="180" height="8" rx="4" fill="#d1d5db"/>
+  <path d="M 420 230 h 12 v 60 h -12 z" fill="#fcd34d"/>
+  <path d="M 360 230 h 12 v 60 h -12 z" fill="#fcd34d"/>
+  <text x="320" y="420" font-family="Inter" font-size="18" fill="#475569" text-anchor="middle">Matlagningsgrädde</text>
+</svg>

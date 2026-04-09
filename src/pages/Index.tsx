@@ -1,119 +1,147 @@
+import { ArrowRight, Shuffle, Zap, Leaf, Sofa } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { ChefHat, Shuffle, Heart, ArrowRight, Zap, Leaf, Sofa, Sparkles } from "lucide-react";
+import { useApp } from "@/context/AppContext";
+import type { Filters } from "@/types/recipe";
 
 const moodChips = [
   { label: "Quick meal", icon: Zap, filter: { cookingTime: "Under 15 min" as const } },
   { label: "Healthy", icon: Leaf, filter: { difficulty: "Easy" as const } },
   { label: "Comfort food", icon: Sofa, filter: { mealType: "Dinner" as const } },
-  { label: "Surprise me", icon: Sparkles, filter: null },
 ];
+
+const heroActions = [
+  {
+    label: "PickaMeal",
+    icon: ArrowRight,
+    emoji: "🥗",
+    path: "/ingredients",
+    gradient: "from-emerald-500 to-emerald-600",
+    description: "Turn pantry staples into a chef-worthy plate.",
+  },
+  {
+    label: "RollaMeal",
+    icon: Shuffle,
+    emoji: "🎲",
+    path: "/rollameal",
+    gradient: "from-orange-500 to-rose-500",
+    description: "Shake up a surprise menu in seconds.",
+  },
+];
+
+const floatingSprites = [
+  { emoji: "🥑", className: "left-[6%] top-[9%] text-[2.6rem]", delay: "0s", duration: "7.2s" },
+  { emoji: "🍕", className: "right-[5%] top-[7%] text-[2.8rem]", delay: "0.8s", duration: "6.6s" },
+  { emoji: "🌮", className: "left-[7%] bottom-[18%] text-[2.1rem]", delay: "0.4s", duration: "7s" },
+  { emoji: "🍜", className: "right-[8%] bottom-[16%] text-[2.15rem]", delay: "1.7s", duration: "7.4s" },
+];
+
+const baseFilters: Filters = {
+  cuisine: null,
+  cookingTime: null,
+  difficulty: null,
+  mealType: null,
+  useMostlyMyIngredients: false,
+};
 
 const Index = () => {
   const navigate = useNavigate();
+  const { setFilters } = useApp();
 
   const handleMood = (chip: typeof moodChips[0]) => {
     if (chip.filter === null) {
-      navigate("/random");
+      navigate("/rollameal");
     } else {
+      setFilters({ ...baseFilters, ...chip.filter });
       navigate("/results");
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-20">
-      {/* Hero section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-accent/5 to-background" />
-        <div className="absolute top-6 right-6 text-6xl animate-float opacity-80">🍳</div>
-        <div className="absolute top-20 left-8 text-4xl animate-float" style={{ animationDelay: '1s' }}>🥑</div>
-        <div className="absolute top-8 left-1/2 text-3xl animate-float" style={{ animationDelay: '0.5s' }}>🍕</div>
-        
-        <div className="relative flex flex-col items-center pt-16 pb-8 px-6">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-primary/10 mb-5 animate-bounce-in">
-            <ChefHat className="w-10 h-10 text-primary" />
+    <div className="min-h-screen bg-gradient-to-b from-[#fdfcf8] via-[#fffdef] to-[#eefef2] text-foreground">
+      <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <section className="relative overflow-hidden rounded-[40px] bg-gradient-to-b from-[#f7fff6] to-[#fff5ef] shadow-[0_30px_60px_-35px_rgba(15,23,42,0.6)]">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/15 via-transparent to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#d6ffe3] to-transparent blur-3xl" />
+          {floatingSprites.map((sprite) => (
+            <span
+              key={sprite.emoji}
+              className={`pointer-events-none absolute select-none leading-none drop-shadow-[0_10px_18px_rgba(15,23,42,0.18)] animate-hero-sprite ${sprite.className}`}
+              style={{ animationDelay: sprite.delay, animationDuration: sprite.duration }}
+            >
+              {sprite.emoji}
+            </span>
+          ))}
+
+          <div className="relative flex flex-col items-center gap-3 text-center px-5 py-6">
+            <div className="relative w-full">
+              <div className="pointer-events-none absolute inset-x-[16%] bottom-[8%] top-[18%] rounded-full bg-white/30 blur-3xl" />
+              <img
+                src="/logo.png"
+                alt="PickaMeal logo"
+                className="animate-hero-logo relative mx-auto w-full max-w-[360px] object-contain drop-shadow-[0_14px_22px_rgba(15,23,42,0.14)]"
+              />
+            </div>
+            <div className="space-y-1 px-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.5em] text-foreground/60">Meals in minutes</p>
+            </div>
           </div>
-          <h1 className="text-4xl font-bold text-foreground tracking-tight animate-fade-in">
-            PickaMeal
-          </h1>
-          <p className="mt-3 text-muted-foreground text-lg max-w-xs mx-auto leading-relaxed text-center animate-fade-in opacity-0 stagger-2">
-            Pick what you have. Find what to cook.
-          </p>
-        </div>
-      </div>
+        </section>
 
-      {/* Mood chips */}
-      <div className="px-6 mb-8 animate-fade-in-up opacity-0 stagger-3">
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">How are you feeling?</p>
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
-          {moodChips.map((chip) => {
-            const Icon = chip.icon;
-            return (
-              <button
-                key={chip.label}
-                onClick={() => handleMood(chip)}
-                className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full bg-secondary text-secondary-foreground text-sm font-medium border border-border/50 btn-press hover:bg-primary/10 hover:border-primary/30 transition-colors"
-              >
-                <Icon className="w-4 h-4" />
-                {chip.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+        <section className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-lg font-semibold text-foreground">Quick starts</p>
+            <button
+              type="button"
+              onClick={() => {
+                setFilters({ ...baseFilters });
+                navigate("/results");
+              }}
+              className="rounded-full border border-border/50 bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-foreground/70 transition hover:border-foreground hover:text-foreground"
+            >
+              All recipes
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {moodChips.map((chip) => {
+              const Icon = chip.icon;
+              return (
+                <button
+                  key={chip.label}
+                  onClick={() => handleMood(chip)}
+                  className="flex items-center gap-2 rounded-full border border-border/40 bg-white/85 px-4 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:border-foreground"
+                >
+                  <Icon className="h-4 w-4" />
+                  {chip.label}
+                </button>
+              );
+            })}
+          </div>
+        </section>
 
-      {/* Main actions */}
-      <div className="px-6 flex-1">
-        <div className="w-full max-w-sm mx-auto flex flex-col gap-3">
-          <button
-            onClick={() => navigate("/ingredients")}
-            className="w-full flex items-center justify-between px-6 py-5 rounded-2xl bg-primary text-primary-foreground font-semibold text-base shadow-md btn-press group animate-fade-in-up opacity-0 stagger-3"
-          >
-            <span className="flex items-center gap-3">
-              <span className="w-10 h-10 rounded-xl bg-primary-foreground/20 flex items-center justify-center">
-                <ArrowRight className="w-5 h-5" />
-              </span>
-              Start Picking
-            </span>
-            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-          </button>
-
-          <button
-            onClick={() => navigate("/random")}
-            className="w-full flex items-center justify-between px-6 py-5 rounded-2xl bg-accent text-accent-foreground font-semibold text-base shadow-md btn-press group animate-fade-in-up opacity-0 stagger-4"
-          >
-            <span className="flex items-center gap-3">
-              <span className="w-10 h-10 rounded-xl bg-accent-foreground/20 flex items-center justify-center">
-                <Shuffle className="w-5 h-5" />
-              </span>
-              Random Meal
-            </span>
-            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-          </button>
-
-          <button
-            onClick={() => navigate("/saved")}
-            className="w-full flex items-center justify-between px-6 py-5 rounded-2xl bg-card text-foreground font-semibold text-base shadow-sm border border-border btn-press group animate-fade-in-up opacity-0 stagger-5"
-          >
-            <span className="flex items-center gap-3">
-              <span className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
-                <Heart className="w-5 h-5 text-accent" />
-              </span>
-              Saved Recipes
-            </span>
-            <ArrowRight className="w-5 h-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
-          </button>
-        </div>
-      </div>
-
-      {/* Food illustration strip */}
-      <div className="mt-8 px-6 animate-fade-in opacity-0 stagger-6">
-        <div className="flex justify-center gap-3 text-3xl">
-          <span className="animate-float" style={{ animationDelay: '0s' }}>🥘</span>
-          <span className="animate-float" style={{ animationDelay: '0.3s' }}>🍜</span>
-          <span className="animate-float" style={{ animationDelay: '0.6s' }}>🥗</span>
-          <span className="animate-float" style={{ animationDelay: '0.9s' }}>🌮</span>
-          <span className="animate-float" style={{ animationDelay: '1.2s' }}>🍝</span>
-        </div>
+        <section className="space-y-3 pb-24">
+          <div className="grid gap-3 sm:grid-cols-2">
+            {heroActions.map((action) => {
+              const Icon = action.icon;
+              return (
+                <button
+                  key={action.label}
+                  onClick={() => navigate(action.path)}
+                  type="button"
+                  className={`group flex min-h-[152px] flex-col gap-2 rounded-[30px] border border-transparent bg-gradient-to-br ${action.gradient} px-5 py-4 text-left text-white shadow-[0_25px_50px_-30px_rgba(15,23,42,0.75)] transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70`}
+                >
+                  <div className="flex items-center gap-3 text-lg font-semibold">
+                    <span className="text-2xl">{action.emoji}</span>
+                    <span>{action.label}</span>
+                  </div>
+                  <p className="text-sm leading-6 text-white/90">{action.description}</p>
+                  <span className="ml-auto flex h-10 w-10 items-center justify-center rounded-2xl bg-white/20 transition group-hover:bg-white/40">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
       </div>
     </div>
   );

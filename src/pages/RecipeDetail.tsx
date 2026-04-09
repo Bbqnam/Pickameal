@@ -1,13 +1,29 @@
+import { useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useApp } from "@/context/AppContext";
-import { recipes } from "@/data/recipes";
-import { ArrowLeft, Heart, Clock, ChefHat, Check, Circle, Share2 } from "lucide-react";
+import { ArrowLeft, Heart, Clock, ChefHat, Check, Circle } from "lucide-react";
+import { matchesAnySelection, normalizeSelectionList } from "@/lib/ingredientMatching";
 
 const RecipeDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { toggleSaved, isSaved, selectedIngredients } = useApp();
+  const { recipes, toggleSaved, isSaved, selectedIngredients } = useApp();
+  const normalizedSelectedIngredients = useMemo(
+    () => normalizeSelectionList(selectedIngredients),
+    [selectedIngredients]
+  );
   const recipe = recipes.find(r => r.id === id);
+
+  if (recipes.length === 0) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center animate-fade-in">
+          <span className="text-5xl">🍳</span>
+          <p className="text-foreground mt-4 font-medium">Loading recipes...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!recipe) {
     return (
@@ -24,15 +40,15 @@ const RecipeDetail = () => {
   }
 
   const saved = isSaved(recipe.id);
-  const matchCount = recipe.ingredients.filter(i =>
-    selectedIngredients.some(si => si.toLowerCase() === i.toLowerCase())
+  const matchCount = recipe.ingredients.filter((ingredient) =>
+    matchesAnySelection(ingredient, normalizedSelectedIngredients)
   ).length;
 
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Hero image */}
       <div className="relative">
-        <img src={recipe.image} alt={recipe.title} className="w-full h-80 object-cover" />
+        <img src={recipe.image} alt={recipe.title} loading="lazy" className="w-full h-80 object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
         <div className="absolute top-4 left-4 right-4 flex justify-between">
           <button
@@ -93,9 +109,7 @@ const RecipeDetail = () => {
           <h2 className="text-lg font-semibold text-foreground mb-3">Ingredients</h2>
           <div className="bg-card rounded-xl border border-border/50 p-4 space-y-2.5">
             {recipe.ingredients.map(ing => {
-              const hasIt = selectedIngredients.some(
-                si => si.toLowerCase() === ing.toLowerCase()
-              );
+              const hasIt = matchesAnySelection(ing, normalizedSelectedIngredients);
               return (
                 <div key={ing} className={`flex items-center gap-2.5 py-1 ${hasIt ? '' : ''}`}>
                   {hasIt ? (

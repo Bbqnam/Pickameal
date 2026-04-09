@@ -1,15 +1,17 @@
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "@/context/AppContext";
-import { Cuisine, CookingTime, Difficulty, MealType } from "@/types/recipe";
+import { Cuisine, CookingTime, Difficulty, MealType, Filters } from "@/types/recipe";
 import { ArrowRight, RotateCcw } from "lucide-react";
+import RecipeProgressBar from "@/components/RecipeProgressBar";
 
-const cuisines: Cuisine[] = ["Asian", "Western", "Mexican", "Italian", "Middle Eastern"];
+const cuisines: Cuisine[] = ["Asian", "Western", "Mexican", "Italian", "Middle Eastern", "Mediterranean"];
 const times: CookingTime[] = ["Under 15 min", "Under 30 min", "Under 60 min"];
 const difficulties: Difficulty[] = ["Easy", "Medium", "Hard"];
 const mealTypes: MealType[] = ["Breakfast", "Lunch", "Dinner", "Snack"];
 
 const cuisineEmoji: Record<string, string> = {
-  Asian: "🍜", Western: "🥩", Mexican: "🌮", Italian: "🍝", "Middle Eastern": "🧆"
+  Asian: "🍜", Western: "🥩", Mexican: "🌮", Italian: "🍝", "Middle Eastern": "🧆", Mediterranean: "🫒"
 };
 const diffEmoji: Record<string, string> = { Easy: "😊", Medium: "👨‍🍳", Hard: "🔥" };
 const mealEmoji: Record<string, string> = { Breakfast: "🌅", Lunch: "☀️", Dinner: "🌙", Snack: "🍿" };
@@ -39,24 +41,40 @@ const FilterChip = ({
 );
 
 const FiltersPage = () => {
-  const { filters, setFilters, clearFilters, selectedIngredients } = useApp();
+  const { filters, setFilters, clearFilters, selectedIngredients, recipes, getFilteredRecipes } = useApp();
+  const filteredCount = useMemo(() => getFilteredRecipes().length, [getFilteredRecipes]);
+  const totalCount = recipes.length || filteredCount || 1;
+  const filteredPercent = totalCount > 0 ? (filteredCount / totalCount) * 100 : 0;
   const navigate = useNavigate();
 
-  const update = (key: string, value: any) => {
-    setFilters({
-      ...filters,
-      [key]: filters[key as keyof typeof filters] === value ? null : value,
-    });
+  const update = <K extends keyof Filters>(key: K, value: Exclude<Filters[K], null>) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: prev[key] === value ? null : value,
+    }));
   };
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border px-4 pt-6 pb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Filters</h1>
-        <button onClick={clearFilters} className="flex items-center gap-1 text-sm text-muted-foreground btn-press hover:text-foreground transition-colors">
-          <RotateCcw className="w-3.5 h-3.5" />
-          Reset
-        </button>
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border px-4 pt-6 pb-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-foreground">Filters</h1>
+          <button onClick={clearFilters} className="flex items-center gap-1 text-sm text-muted-foreground btn-press hover:text-foreground transition-colors">
+            <RotateCcw className="w-3.5 h-3.5" />
+            Reset
+          </button>
+        </div>
+        <div className="mt-3">
+          <div className="rounded-[28px] border border-border bg-card/80 px-4 py-3 shadow-sm">
+            <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.35em] text-muted-foreground">
+              <span>Matching recipes</span>
+              <span className="text-foreground">{filteredCount}/{totalCount}</span>
+            </div>
+            <div className="mt-2">
+              <RecipeProgressBar percent={filteredPercent} />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="px-4 pt-5 space-y-7">

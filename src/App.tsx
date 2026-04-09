@@ -11,7 +11,9 @@ import FiltersPage from "./pages/FiltersPage";
 import Results from "./pages/Results";
 import RecipeDetail from "./pages/RecipeDetail";
 import SavedRecipes from "./pages/SavedRecipes";
-import RandomPicker from "./pages/RandomPicker";
+import RollaMeal from "./pages/RollaMeal";
+import Onboarding from "./pages/Onboarding";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,7 +25,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AppProvider>
-          <div className="max-w-lg mx-auto min-h-screen relative">
+          <div className="max-w-lg mx-auto min-h-screen relative scale-[0.92] origin-top">
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/ingredients" element={<Ingredients />} />
@@ -31,7 +33,9 @@ const App = () => (
               <Route path="/results" element={<Results />} />
               <Route path="/recipe/:id" element={<RecipeDetail />} />
               <Route path="/saved" element={<SavedRecipes />} />
-              <Route path="/random" element={<RandomPicker />} />
+              <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/rollameal" element={<RollaMeal />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <BottomNav />

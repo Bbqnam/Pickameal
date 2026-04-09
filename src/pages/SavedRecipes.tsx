@@ -42,7 +42,8 @@ const SavedRecipes = () => {
               <img
                 src={recipe.image}
                 alt={recipe.title}
-                className="w-24 h-24 object-cover flex-shrink-0"
+                loading="lazy"
+                className="w-24 h-24 object-cover rounded-2xl flex-shrink-0"
               />
               <div className="flex-1 py-3 pr-2 min-w-0">
                 <h3 className="font-semibold text-foreground text-sm truncate">{recipe.title}</h3>
