@@ -390,7 +390,9 @@ const RollaMeal = () => {
       stopRolling();
     }
   }, [stopRolling]);
-
+useEffect(() => {
+  rollingRef.current = rolling;
+}, [rolling]);
   useEffect(() => {
     return () => {
       clearRollTimers();
