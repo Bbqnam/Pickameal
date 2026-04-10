@@ -4,6 +4,7 @@ import {
   fallbackIngredientImage,
   resolveIngredientImage,
 } from "../lib/apiLoader.ts";
+import { normalizeForMatching } from "@/lib/ingredientMatching";
 
 export const fallbackDefinitions: Array<{ name: string; category: IngredientCategory }> = [
   { name: "Chicken breast", category: "Protein" },
@@ -58,7 +59,6 @@ export const fallbackDefinitions: Array<{ name: string; category: IngredientCate
   { name: "Lemongrass", category: "Vegetables" },
   { name: "Cilantro", category: "Vegetables" },
   { name: "Pickled carrots", category: "Vegetables" },
-  { name: "Pickled carrot", category: "Vegetables" },
   { name: "Mint", category: "Vegetables" },
   { name: "Rice", category: "Carbs" },
   { name: "Rice Noodle", category: "Carbs" },
@@ -116,43 +116,70 @@ export const fallbackDefinitions: Array<{ name: string; category: IngredientCate
   { name: "Peanut sauce", category: "Extras" },
 ];
 
-const fallbackIngredients: Ingredient[] = fallbackDefinitions.map((ingredient) => {
+const ingredientKeyFor = (name: string) => normalizeForMatching(name) || name.trim().toLowerCase();
+
+const canonicalFallbackDefinitions = Array.from(
+  fallbackDefinitions.reduce((map, ingredient) => {
+    const key = ingredientKeyFor(ingredient.name);
+    if (!map.has(key)) {
+      map.set(key, ingredient);
+    }
+    return map;
+  }, new Map<string, { name: string; category: IngredientCategory }>())
+    .values()
+);
+
+const fallbackDefinitionByKey = new Map(
+  canonicalFallbackDefinitions.map((ingredient) => [ingredientKeyFor(ingredient.name), ingredient] as const)
+);
+
+const fallbackIngredients: Ingredient[] = canonicalFallbackDefinitions.map((ingredient) => {
   const { image, secondaryImage } = resolveIngredientImage(ingredient.name);
   return { ...ingredient, image, secondaryImage };
 });
 
-const ingredientCache: Ingredient[] = [...fallbackIngredients];
+let ingredientCache: Ingredient[] = [...fallbackIngredients];
 
 export async function refreshIngredients() {
   const fetched = await loadIngredients();
   const merged = new Map<string, Ingredient>();
   const addIngredient = (ingredient: Ingredient) => {
-    const key = ingredient.name.trim().toLowerCase();
+    const key = ingredientKeyFor(ingredient.name);
+    const preferred = fallbackDefinitionByKey.get(key);
+    const normalizedIngredient: Ingredient = {
+      ...ingredient,
+      name: preferred?.name ?? ingredient.name,
+      category: preferred?.category ?? ingredient.category,
+    };
     const existing = merged.get(key);
     if (!existing) {
-      merged.set(key, ingredient);
+      merged.set(key, normalizedIngredient);
       return;
     }
     merged.set(key, {
       ...existing,
-      ...ingredient,
-      image: ingredient.image ?? existing.image,
-      secondaryImage: ingredient.secondaryImage ?? existing.secondaryImage,
+      ...normalizedIngredient,
+      image: normalizedIngredient.image ?? existing.image,
+      secondaryImage: normalizedIngredient.secondaryImage ?? existing.secondaryImage,
     });
   };
 
   fallbackIngredients.forEach((ingredient) => addIngredient(ingredient));
   fetched.forEach((ingredient) => {
-    const { image, secondaryImage } = resolveIngredientImage(ingredient.name);
+    const key = ingredientKeyFor(ingredient.name);
+    const preferred = fallbackDefinitionByKey.get(key);
+    const canonicalName = preferred?.name ?? ingredient.name;
+    const { image, secondaryImage } = resolveIngredientImage(canonicalName);
     addIngredient({
       ...ingredient,
+      name: canonicalName,
+      category: preferred?.category ?? ingredient.category,
       image: ingredient.image ?? image,
       secondaryImage: ingredient.secondaryImage ?? secondaryImage,
     });
   });
 
-  ingredientCache.length = 0;
-  ingredientCache.push(...merged.values());
+  ingredientCache = [...merged.values()];
   return ingredientCache;
 }
 

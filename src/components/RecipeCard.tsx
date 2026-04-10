@@ -20,7 +20,7 @@ const RecipeCard = ({ recipe, index = 0 }: RecipeCardProps) => {
 
   return (
     <div
-      className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border/50 card-hover animate-fade-in-up opacity-0"
+      className="flex h-full flex-col overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm card-hover animate-fade-in-up opacity-0"
       style={{ animationDelay: `${index * 0.08}s` }}
     >
       <div className="relative">
@@ -58,8 +58,18 @@ const RecipeCard = ({ recipe, index = 0 }: RecipeCardProps) => {
         </div>
       </div>
 
-      <div className="p-4">
-        <h3 className="font-semibold text-foreground text-lg leading-tight">{recipe.title}</h3>
+      <div className="flex flex-1 flex-col p-4">
+        <h3
+          className="min-h-[3.5rem] text-lg font-semibold leading-tight text-foreground"
+          style={{
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
+          {recipe.title}
+        </h3>
         <div className="flex items-center gap-3 mt-2 text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" />
@@ -89,7 +99,7 @@ const RecipeCard = ({ recipe, index = 0 }: RecipeCardProps) => {
 
         <button
           onClick={() => navigate(`/recipe/${recipe.id}`)}
-          className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary/10 text-primary text-sm font-semibold btn-press hover:bg-primary hover:text-primary-foreground transition-colors"
+          className="mt-auto w-full flex items-center justify-center gap-2 rounded-xl bg-primary/10 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground btn-press"
         >
           View Recipe
           <ArrowRight className="w-4 h-4" />

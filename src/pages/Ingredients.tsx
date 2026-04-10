@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "@/context/AppContext";
 import { getIngredients } from "@/data/ingredients";
+import { getRecipes } from "@/data/recipes";
 import { fallbackIngredientImage } from "@/lib/apiLoader";
-import { Search, ArrowRight, X, Check, ChevronRight } from "lucide-react";
+import { matchesAnySelection, normalizeSelectionList } from "@/lib/ingredientMatching";
+import { Search, ArrowRight, X, Check, ChevronRight, ArrowUpDown } from "lucide-react";
 import { Ingredient, IngredientCategory } from "@/types/recipe";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer";
 import RecipeProgressBar from "@/components/RecipeProgressBar";
@@ -29,6 +31,13 @@ const placeholderAccents: Record<IngredientCategory, string> = {
   Vegetables: "from-emerald-100 via-lime-50 to-teal-100",
   Carbs: "from-yellow-100 via-orange-50 to-amber-100",
   Extras: "from-slate-100 via-zinc-50 to-stone-100",
+};
+
+type IngredientSortMode = "popular" | "alphabetical";
+
+const ingredientSortMeta: Record<IngredientSortMode, { label: string; button: string }> = {
+  popular: { label: "Most recipes", button: "Popular" },
+  alphabetical: { label: "A-Z", button: "A-Z" },
 };
 
 const getIngredientPlaceholderEmoji = (name: string, category: IngredientCategory) => {
@@ -65,20 +74,22 @@ const Ingredients = () => {
   const [activeCategory, setActiveCategory] = useState<IngredientCategory | null>(null);
   const [search, setSearch] = useState("");
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+  const [sortMode, setSortMode] = useState<IngredientSortMode>("popular");
   const navigate = useNavigate();
+  const sourceRecipes = useMemo(() => (recipes.length ? recipes : getRecipes()), [recipes]);
 
   const ingredientRecipeCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    const sourceRecipes = recipes.length ? recipes : [];
     ingredientList.forEach((ingredient) => {
+      const normalizedSelections = normalizeSelectionList([ingredient.name]);
       counts[ingredient.name] = sourceRecipes.filter((recipe) =>
-        recipe.ingredients.some((name) => name.toLowerCase() === ingredient.name.toLowerCase())
+        recipe.ingredients.some((name) => matchesAnySelection(name, normalizedSelections))
       ).length;
     });
     return counts;
-  }, [ingredientList, recipes]);
+  }, [ingredientList, sourceRecipes, sourceRecipes.length]);
 
-  const totalRecipes = recipes.length;
+  const totalRecipes = sourceRecipes.length;
   const matchedRecipeCount = useMemo(() => {
     if (totalRecipes === 0) return 0;
     return selectedIngredients.length === 0 ? totalRecipes : getFilteredRecipes().length;
@@ -88,11 +99,20 @@ const Ingredients = () => {
   const enrichedIngredients = useMemo(() => ingredientList, [ingredientList]);
 
   const filteredIngredients = useMemo(() => {
-    if (!activeCategory) return enrichedIngredients;
-    return enrichedIngredients
+    const filtered = !activeCategory
+      ? enrichedIngredients
+      : enrichedIngredients
       .filter((ing) => ing.category === activeCategory)
       .filter((ing) => ing.name.toLowerCase().includes(search.toLowerCase()));
-  }, [activeCategory, search, enrichedIngredients]);
+
+    return [...filtered].sort((left, right) => {
+      if (sortMode === "popular") {
+        const recipeDelta = (ingredientRecipeCounts[right.name] ?? 0) - (ingredientRecipeCounts[left.name] ?? 0);
+        if (recipeDelta !== 0) return recipeDelta;
+      }
+      return left.name.localeCompare(right.name);
+    });
+  }, [activeCategory, search, enrichedIngredients, sortMode, ingredientRecipeCounts]);
 
   const getCategorySelectionCount = (cat: IngredientCategory) =>
     enrichedIngredients.filter((ing) => ing.category === cat && selectedIngredients.includes(ing.name)).length;
@@ -216,6 +236,19 @@ const Ingredients = () => {
                 </button>
               )}
             </div>
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <p className="text-xs font-medium text-muted-foreground">
+                Sorted by {ingredientSortMeta[sortMode].label}
+              </p>
+              <button
+                type="button"
+                onClick={() => setSortMode((prev) => (prev === "popular" ? "alphabetical" : "popular"))}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm btn-press"
+              >
+                <ArrowUpDown className="h-3.5 w-3.5" />
+                {ingredientSortMeta[sortMode].button}
+              </button>
+            </div>
           </DrawerHeader>
 
           <div className="px-4 pb-4 overflow-y-auto flex-1">
@@ -236,7 +269,7 @@ const Ingredients = () => {
                   aria-pressed={selected}
                   className={`relative overflow-hidden rounded-[26px] border px-0 text-left bg-card transition-all duration-200 btn-press focus-visible:ring-2 focus-visible:ring-primary/40 aspect-[4/3] sm:aspect-[3/2] ${
                     selected
-                      ? "border-transparent shadow-[0_20px_60px_-30px_rgba(16,185,129,0.85)] ring-2 ring-emerald-400/70 bg-gradient-to-br from-emerald-50/80 to-emerald-200/60 scale-[1.005]"
+                      ? "border-emerald-200 shadow-[0_20px_60px_-30px_rgba(16,185,129,0.85)] ring-2 ring-emerald-400/70 bg-gradient-to-br from-emerald-50/80 to-emerald-200/60 scale-[1.005]"
                       : "border-border shadow-md hover:-translate-y-0.5 hover:shadow-lg"
                   }`}
                   style={{ animationDelay: `${i * 0.03}s` }}
@@ -285,7 +318,8 @@ const Ingredients = () => {
                         </div>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                    <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/65 via-black/25 to-transparent" />
                     {selected && (
                       <>
                         <div className="absolute inset-0 bg-emerald-500/20 mix-blend-screen" />
@@ -297,11 +331,9 @@ const Ingredients = () => {
                     )}
                   </div>
                   <div className="relative z-10 flex h-full flex-col justify-between p-3 text-white">
-                    <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.35em] text-white/80">
-                      <span>{recipeCount} recipes</span>
-                      <span className="flex items-center gap-1 text-xs">
-                        {selected ? <Check className="w-4 h-4" /> : <span className="text-sm leading-none">+</span>}
-                        {selected ? "Selected" : "Add"}
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="rounded-full bg-black/45 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.32em] text-white shadow-sm backdrop-blur-sm">
+                        {recipeCount} recipes
                       </span>
                     </div>
                     <div className="mt-2">

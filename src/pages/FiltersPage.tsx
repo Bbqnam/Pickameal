@@ -5,13 +5,35 @@ import { Cuisine, CookingTime, Difficulty, MealType, Filters } from "@/types/rec
 import { ArrowRight, RotateCcw } from "lucide-react";
 import RecipeProgressBar from "@/components/RecipeProgressBar";
 
-const cuisines: Cuisine[] = ["Asian", "Western", "Mexican", "Italian", "Middle Eastern", "Mediterranean"];
+const cuisines: Cuisine[] = [
+  "Vietnamese",
+  "Korean",
+  "Chinese",
+  "Thai",
+  "Japanese",
+  "Asian",
+  "Western",
+  "Mexican",
+  "Italian",
+  "Middle Eastern",
+  "Mediterranean",
+];
 const times: CookingTime[] = ["Under 15 min", "Under 30 min", "Under 60 min"];
 const difficulties: Difficulty[] = ["Easy", "Medium", "Hard"];
 const mealTypes: MealType[] = ["Breakfast", "Lunch", "Dinner", "Snack"];
 
 const cuisineEmoji: Record<string, string> = {
-  Asian: "🍜", Western: "🥩", Mexican: "🌮", Italian: "🍝", "Middle Eastern": "🧆", Mediterranean: "🫒"
+  Vietnamese: "🍲",
+  Korean: "🔥",
+  Chinese: "🥢",
+  Thai: "🍛",
+  Japanese: "🍙",
+  Asian: "🍜",
+  Western: "🥩",
+  Mexican: "🌮",
+  Italian: "🍝",
+  "Middle Eastern": "🧆",
+  Mediterranean: "🫒",
 };
 const diffEmoji: Record<string, string> = { Easy: "😊", Medium: "👨‍🍳", Hard: "🔥" };
 const mealEmoji: Record<string, string> = { Breakfast: "🌅", Lunch: "☀️", Dinner: "🌙", Snack: "🍿" };

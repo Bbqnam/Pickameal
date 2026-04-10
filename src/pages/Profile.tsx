@@ -34,6 +34,11 @@ const groupIcons = {
 } as const;
 
 const cuisineItemIcons: Record<string, string> = {
+  Vietnamese: "🍲",
+  Korean: "🔥",
+  Chinese: "🥢",
+  Thai: "🍛",
+  Japanese: "🍙",
   Asian: "🍜",
   Western: "🍽",
   Mexican: "🌮",

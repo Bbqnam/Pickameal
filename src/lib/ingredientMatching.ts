@@ -1,8 +1,26 @@
 import { sanitizeIngredientName } from "@/lib/apiLoader";
 
 const ingredientCanonicalAliases: Record<string, string> = {
-  "beef-slices": "beef",
-  "beef-slice": "beef",
+  sausage: "sausage",
+  sausages: "sausage",
+  mussel: "mussels",
+  mussels: "mussels",
+  chickpea: "chickpeas",
+  chickpeas: "chickpeas",
+  lentil: "lentils",
+  lentils: "lentils",
+  "black-bean": "black-beans",
+  "black-beans": "black-beans",
+  "green-bean": "green-beans",
+  "green-beans": "green-beans",
+  "bean-sprout": "bean-sprouts",
+  "bean-sprouts": "bean-sprouts",
+  "rice-noodles": "rice-noodle",
+  "rice-noodle": "rice-noodle",
+  "pickled-carrot": "pickled-carrots",
+  "pickled-carrots": "pickled-carrots",
+  "beef-slices": "beef-slices",
+  "beef-slice": "beef-slices",
   "beef-steak": "beef",
   "beef-sirloin": "beef",
   "beef-ribeye": "beef",
@@ -69,10 +87,7 @@ export const normalizeSelectionList = (ingredients: string[]) =>
 
 export const matchesNormalizedValues = (normalizedValue: string, normalizedSelection: string) => {
   if (!normalizedValue || !normalizedSelection) return false;
-  return (
-    normalizedValue.includes(normalizedSelection) ||
-    normalizedSelection.includes(normalizedValue)
-  );
+  return normalizedValue === normalizedSelection;
 };
 
 export const matchesAnySelection = (ingredient: string, normalizedSelections: string[]) => {

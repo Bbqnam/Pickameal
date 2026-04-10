@@ -1,4 +1,15 @@
-export type Cuisine = "Asian" | "Western" | "Mexican" | "Italian" | "Middle Eastern" | "Mediterranean";
+export type Cuisine =
+  | "Asian"
+  | "Vietnamese"
+  | "Korean"
+  | "Chinese"
+  | "Thai"
+  | "Japanese"
+  | "Western"
+  | "Mexican"
+  | "Italian"
+  | "Middle Eastern"
+  | "Mediterranean";
 export type MealType = "Breakfast" | "Lunch" | "Dinner" | "Snack";
 export type Difficulty = "Easy" | "Medium" | "Hard";
 export type CookingTime = "Under 15 min" | "Under 30 min" | "Under 60 min";

@@ -1,12 +1,11 @@
 import type { Recipe } from "@/types/recipe";
 import { loadRecipes } from "@/lib/apiLoader";
 
-const recipeCache: Recipe[] = [];
+let recipeCache: Recipe[] = [];
 
 export async function refreshRecipes() {
   const fetched = await loadRecipes();
-  recipeCache.length = 0;
-  recipeCache.push(...fetched);
+  recipeCache = [...fetched];
   return recipeCache;
 }
 

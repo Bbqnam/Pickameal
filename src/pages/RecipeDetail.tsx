@@ -43,6 +43,7 @@ const RecipeDetail = () => {
   const matchCount = recipe.ingredients.filter((ingredient) =>
     matchesAnySelection(ingredient, normalizedSelectedIngredients)
   ).length;
+  const instructionSteps = recipe.instructions.filter((step) => step.trim().length > 0);
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -137,7 +138,7 @@ const RecipeDetail = () => {
         <section className="mt-6 animate-fade-in-up opacity-0 stagger-4">
           <h2 className="text-lg font-semibold text-foreground mb-3">Instructions</h2>
           <div className="space-y-4">
-            {recipe.instructions.map((step, i) => (
+            {instructionSteps.map((step, i) => (
               <div key={i} className="flex gap-3">
                 <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center">
                   {i + 1}
