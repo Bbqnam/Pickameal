@@ -190,6 +190,7 @@ const RollaMeal = () => {
   const holdDelayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tapStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const holdRollingRef = useRef(false);
+  const rollingRef = useRef(false);
   const basePool = useMemo(() => getFilteredRecipes(), [getFilteredRecipes]);
 
   const filteredPool = useMemo(() => {
