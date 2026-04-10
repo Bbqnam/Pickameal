@@ -270,12 +270,13 @@ const RollaMeal = () => {
   }, []);
 
   const closeRollDialog = useCallback(() => {
-    clearRollTimers();
-    setRolling(false);
-    setSlotSettled(false);
-    setSlotWinnerId(null);
-    setRollDialogOpen(false);
-  }, [clearRollTimers]);
+  clearRollTimers();
+  setRolling(false);
+  rollingRef.current = false;
+  setSlotSettled(false);
+  setSlotWinnerId(null);
+  setRollDialogOpen(false);
+}, [clearRollTimers]);
 
   const openRollDialog = useCallback(() => {
     if (!filteredPool.length) {
@@ -292,7 +293,7 @@ const RollaMeal = () => {
   }, [buildSlotFrame, clearRollTimers, filteredPool]);
 
   const stopRolling = useCallback(() => {
-    if (!rolling) return;
+  if (!rollingRef.current) return;
     clearRollTimers();
     const winner = pickWeightedRecipe(filteredPool);
     const slowdownSteps =
@@ -306,6 +307,7 @@ const RollaMeal = () => {
     });
 
     setRolling(false);
+    rollingRef.current = false;
     setSlotSettled(false);
     setSlotWinnerId(winner.id);
     setSlotRecipes(frames[0]);
@@ -345,6 +347,7 @@ const RollaMeal = () => {
       tapStopTimerRef.current = null;
     }
     setRolling(true);
+    rollingRef.current = true;
     setSlotSettled(false);
     setSlotWinnerId(null);
     setSlotRecipes(buildSlotFrame(filteredPool));
