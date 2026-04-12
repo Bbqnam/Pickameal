@@ -4,7 +4,7 @@ import {
   fallbackIngredientImage,
   resolveIngredientImage,
 } from "../lib/apiLoader.ts";
-import { normalizeForMatching } from "@/lib/ingredientMatching";
+import { normalizeForIngredientKey } from "@/lib/ingredientMatching";
 
 export const fallbackDefinitions: Array<{ name: string; category: IngredientCategory }> = [
   { name: "Chicken breast", category: "Protein" },
@@ -116,7 +116,7 @@ export const fallbackDefinitions: Array<{ name: string; category: IngredientCate
   { name: "Peanut sauce", category: "Extras" },
 ];
 
-const ingredientKeyFor = (name: string) => normalizeForMatching(name) || name.trim().toLowerCase();
+const ingredientKeyFor = (name: string) => normalizeForIngredientKey(name) || name.trim().toLowerCase();
 
 const canonicalFallbackDefinitions = Array.from(
   fallbackDefinitions.reduce((map, ingredient) => {

@@ -4,6 +4,10 @@ import { Dice3, Sparkles, Repeat, Heart, Compass, Flame, Clock, Gauge, XCircle, 
 import { useApp } from "@/context/AppContext";
 import type { Cuisine, Difficulty, Recipe } from "@/types/recipe";
 import RecipeProgressBar from "@/components/RecipeProgressBar";
+import {
+  filterRecipesForRollaMeal,
+  type RollaMealFilterState,
+} from "@/lib/recipeFiltering";
 
 const cuisineOptions: Cuisine[] = [
   "Vietnamese",
@@ -52,18 +56,6 @@ const proteinIcons: Record<string, string> = {
   Mushroom: "🍄",
   Egg: "🥚",
 };
-
-const proteinKeywords: Record<string, RegExp[]> = {
-  Chicken: [/\bchicken\b/i],
-  Beef: [/\bbeef\b/i],
-  Pork: [/\bpork\b/i],
-  Salmon: [/\bsalmon\b/i],
-  Shrimp: [/\bshrimp\b/i],
-  Tofu: [/\btofu\b/i],
-  Lentil: [/\blentil\b/i],
-  Mushroom: [/\bmushroom\b/i],
-  Egg: [/\begg\b/i],
-};
 const styleIcons: Record<(typeof styleOptions)[number], string> = {
   "Quick meal": "⚡",
   Healthy: "🌿",
@@ -107,77 +99,21 @@ const pickRandomRecipe = (pool: Recipe[], excludeIds: Array<Recipe["id"]> = []) 
   return source[Math.floor(Math.random() * source.length)];
 };
 
-const cookingTimeToMax = (value: "Under 15 min" | "Under 30 min" | "Under 60 min" | null) => {
-  if (value === "Under 15 min") return 30;
-  if (value === "Under 30 min") return 30;
-  if (value === "Under 60 min") return 60;
-  return null;
-};
-
-const recipeMatchesStyle = (recipe: Recipe, style: (typeof styleOptions)[number]) => {
-  const tags = recipe.tags.map((tag) => tag.toLowerCase());
-  const ingredients = recipe.ingredients.map((ingredient) => ingredient.toLowerCase());
-
-  if (style === "Quick meal") {
-    return recipe.cookingTime <= 30 || tags.some((tag) => ["quick", "fast", "weeknight"].includes(tag));
-  }
-
-  if (style === "Healthy") {
-    const healthyTags = ["light", "fresh", "vegetarian", "plant-based", "seafood", "herbs"];
-    const richIngredients = ["bacon", "cream", "butter", "cheese", "sausage"];
-    return (
-      tags.some((tag) => healthyTags.includes(tag)) ||
-      (ingredients.some((ingredient) => ["cucumber", "lettuce", "spinach", "bean sprouts", "tomato", "broccoli"].some((needle) => ingredient.includes(needle))) &&
-        !ingredients.some((ingredient) => richIngredients.some((needle) => ingredient.includes(needle))))
-    );
-  }
-
-  return (
-    tags.some((tag) => ["comfort", "hearty", "baked", "curry", "soup", "one-pan", "skillet"].includes(tag)) ||
-    recipe.cookingTime > 40
-  );
-};
-
-const getRecipeSpiceLevel = (recipe: Recipe) => {
-  const tags = recipe.tags.map((tag) => tag.toLowerCase());
-  const ingredients = recipe.ingredients.map((ingredient) => ingredient.toLowerCase());
-
-  if (
-    tags.includes("spicy") ||
-    ingredients.some((ingredient) =>
-      ["chili", "chilli", "chili flakes", "curry paste"].some((needle) => ingredient.includes(needle))
-    )
-  ) {
-    return "Spicy" as const;
-  }
-
-  if (
-    ingredients.some((ingredient) =>
-      ["paprika", "smoked paprika", "curry powder", "ginger", "mustard"].some((needle) => ingredient.includes(needle))
-    )
-  ) {
-    return "Medium" as const;
-  }
-
-  return "Mild" as const;
-};
-
 const RollaMeal = () => {
   const {
-    filters,
-    getFilteredRecipes,
+    recipes,
     scoreRecipe,
     toggleSaved,
     isSaved,
   } = useApp();
   const navigate = useNavigate();
 
-  const [selectedCuisine, setSelectedCuisine] = useState<Cuisine | "">(() => filters.cuisine ?? "");
+  const [selectedCuisine, setSelectedCuisine] = useState<Cuisine | "">("");
   const [selectedProtein, setSelectedProtein] = useState("");
-  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty | "">(() => filters.difficulty ?? "");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty | "">("");
   const [selectedStyle, setSelectedStyle] = useState<(typeof styleOptions)[number] | "">("");
   const [selectedSpiceLevel, setSelectedSpiceLevel] = useState<(typeof spiceLevelOptions)[number] | "">("");
-  const [maxTime, setMaxTime] = useState<number | null>(() => cookingTimeToMax(filters.cookingTime));
+  const [maxTime, setMaxTime] = useState<number | null>(null);
   const [rollDialogOpen, setRollDialogOpen] = useState(false);
   const [rolling, setRolling] = useState(false);
   const [slotRecipes, setSlotRecipes] = useState<Recipe[]>([]);
@@ -189,24 +125,21 @@ const RollaMeal = () => {
   const settleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const holdDelayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tapStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const holdRollingRef = useRef(false);
   const rollingRef = useRef(false);
-  const basePool = useMemo(() => getFilteredRecipes(), [getFilteredRecipes]);
+  const holdRollingRef = useRef(false);
+  const basePool = useMemo(() => recipes, [recipes]);
 
   const filteredPool = useMemo(() => {
     if (!basePool.length) return [];
-    return basePool.filter((recipe) => {
-      if (selectedCuisine && recipe.cuisine !== selectedCuisine) return false;
-      if (selectedDifficulty && recipe.difficulty !== selectedDifficulty) return false;
-      if (maxTime && recipe.cookingTime > maxTime) return false;
-      if (selectedStyle && !recipeMatchesStyle(recipe, selectedStyle)) return false;
-      if (selectedSpiceLevel && getRecipeSpiceLevel(recipe) !== selectedSpiceLevel) return false;
-      if (selectedProtein) {
-        const matchers = proteinKeywords[selectedProtein] ?? [new RegExp(`\\b${selectedProtein}\\b`, "i")];
-        if (!recipe.ingredients.some((ingredient) => matchers.some((matcher) => matcher.test(ingredient)))) return false;
-      }
-      return true;
-    });
+    const localFilters: RollaMealFilterState = {
+      selectedCuisine,
+      selectedProtein,
+      selectedDifficulty,
+      selectedStyle,
+      selectedSpiceLevel,
+      maxTime,
+    };
+    return filterRecipesForRollaMeal(basePool, localFilters);
   }, [basePool, selectedCuisine, selectedDifficulty, maxTime, selectedStyle, selectedSpiceLevel, selectedProtein]);
   const matchPercent = basePool.length > 0 ? (filteredPool.length / basePool.length) * 100 : 0;
 
@@ -270,13 +203,13 @@ const RollaMeal = () => {
   }, []);
 
   const closeRollDialog = useCallback(() => {
-  clearRollTimers();
-  setRolling(false);
-  rollingRef.current = false;
-  setSlotSettled(false);
-  setSlotWinnerId(null);
-  setRollDialogOpen(false);
-}, [clearRollTimers]);
+    clearRollTimers();
+    rollingRef.current = false;
+    setRolling(false);
+    setSlotSettled(false);
+    setSlotWinnerId(null);
+    setRollDialogOpen(false);
+  }, [clearRollTimers]);
 
   const openRollDialog = useCallback(() => {
     if (!filteredPool.length) {
@@ -285,6 +218,7 @@ const RollaMeal = () => {
     }
     setErrorMessage(null);
     clearRollTimers();
+    rollingRef.current = false;
     setRollDialogOpen(true);
     setSelectedRecipe(null);
     setSlotWinnerId(null);
@@ -293,8 +227,9 @@ const RollaMeal = () => {
   }, [buildSlotFrame, clearRollTimers, filteredPool]);
 
   const stopRolling = useCallback(() => {
-  if (!rollingRef.current) return;
+    if (!rollingRef.current) return;
     clearRollTimers();
+    rollingRef.current = false;
     const winner = pickWeightedRecipe(filteredPool);
     const slowdownSteps =
       RELEASE_SLOWDOWN_MIN_STEPS +
@@ -334,10 +269,10 @@ const RollaMeal = () => {
     };
 
     settleTimerRef.current = setTimeout(runSlowdown, RELEASE_SLOWDOWN_BASE_DELAY_MS);
-  }, [buildSlotFrame, clearRollTimers, filteredPool, pickWeightedRecipe, rolling]);
+  }, [buildSlotFrame, clearRollTimers, filteredPool, pickWeightedRecipe]);
 
   const startRolling = useCallback(() => {
-    if (rolling || !rollDialogOpen || !filteredPool.length) return;
+    if (rollingRef.current || !rollDialogOpen || !filteredPool.length) return;
     if (settleTimerRef.current) {
       clearTimeout(settleTimerRef.current);
       settleTimerRef.current = null;
@@ -346,24 +281,24 @@ const RollaMeal = () => {
       clearTimeout(tapStopTimerRef.current);
       tapStopTimerRef.current = null;
     }
-    setRolling(true);
     rollingRef.current = true;
+    setRolling(true);
     setSlotSettled(false);
     setSlotWinnerId(null);
     setSlotRecipes(buildSlotFrame(filteredPool));
     spinIntervalRef.current = setInterval(() => {
       setSlotRecipes(buildSlotFrame(filteredPool));
     }, LIVE_SPIN_INTERVAL_MS);
-  }, [buildSlotFrame, filteredPool, rollDialogOpen, rolling]);
+  }, [buildSlotFrame, filteredPool, rollDialogOpen]);
 
   const handleRollPressStart = useCallback(() => {
-    if (rolling || !rollDialogOpen || !filteredPool.length) return;
+    if (rollingRef.current || !rollDialogOpen || !filteredPool.length) return;
     clearRollTimers();
     holdDelayTimerRef.current = setTimeout(() => {
       holdRollingRef.current = true;
       startRolling();
     }, HOLD_TO_ROLL_DELAY_MS);
-  }, [clearRollTimers, filteredPool.length, rollDialogOpen, rolling, startRolling]);
+  }, [clearRollTimers, filteredPool.length, rollDialogOpen, startRolling]);
 
   const handleRollPressEnd = useCallback(() => {
     if (holdDelayTimerRef.current) {
@@ -376,13 +311,13 @@ const RollaMeal = () => {
       return;
     }
 
-    if (rolling || !rollDialogOpen || !filteredPool.length) return;
+    if (rollingRef.current || !rollDialogOpen || !filteredPool.length) return;
 
     startRolling();
     tapStopTimerRef.current = setTimeout(() => {
       stopRolling();
     }, TAP_ROLL_DURATION_MS);
-  }, [filteredPool.length, rollDialogOpen, rolling, startRolling, stopRolling]);
+  }, [filteredPool.length, rollDialogOpen, startRolling, stopRolling]);
 
   const handleRollPressCancel = useCallback(() => {
     if (holdDelayTimerRef.current) {
@@ -393,9 +328,11 @@ const RollaMeal = () => {
       stopRolling();
     }
   }, [stopRolling]);
-useEffect(() => {
-  rollingRef.current = rolling;
-}, [rolling]);
+
+  useEffect(() => {
+    rollingRef.current = rolling;
+  }, [rolling]);
+
   useEffect(() => {
     return () => {
       clearRollTimers();

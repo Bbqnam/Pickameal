@@ -1,8 +1,14 @@
 import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from "react";
-import { Recipe, Filters, CookingTime, Cuisine, MealType, Difficulty } from "@/types/recipe";
+import { Recipe, Filters, Cuisine, MealType, Difficulty } from "@/types/recipe";
 import { TasteProfile, PreferenceHighlights, CookingTimeBucket } from "@/types/preferences";
 import { getRecipes, refreshRecipes } from "@/data/recipes";
 import { matchesAnySelection, normalizeSelectionList } from "@/lib/ingredientMatching";
+import {
+  applyRecipeFilters,
+  filterRecipesBySelectedIngredients,
+  matchesMostlySelectedIngredients,
+} from "@/lib/recipeFiltering";
+import { rankRecipesForPickaMeal } from "@/lib/recipeRanking";
 import ErrorBanner from "@/components/ErrorBanner";
 
 interface AppState {
@@ -17,7 +23,7 @@ interface AppState {
   reportError: (error: unknown) => void;
   clearError: () => void;
   toggleIngredient: (name: string) => void;
-  setFilters: (filters: Filters) => void;
+  setFilters: React.Dispatch<React.SetStateAction<Filters>>;
   toggleSaved: (id: string) => void;
   isSaved: (id: string) => boolean;
   getFilteredRecipes: () => Recipe[];
@@ -145,12 +151,6 @@ export type PreferenceDecision = keyof typeof preferenceWeights;
 
 const AppContext = createContext<AppState | undefined>(undefined);
 
-function cookingTimeMax(ct: CookingTime): number {
-  if (ct === "Under 15 min") return 15;
-  if (ct === "Under 30 min") return 30;
-  return 60;
-}
-
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [recipes, setRecipes] = useState<Recipe[]>(getRecipes());
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -266,44 +266,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }), [tasteProfile]);
 
   const getFilteredRecipes = useCallback(() => {
-    let result = recipes.length ? recipes : getRecipes();
+    const sourceRecipes = recipes.length ? recipes : getRecipes();
+    let result = filterRecipesBySelectedIngredients(sourceRecipes, selectedIngredients);
+    result = applyRecipeFilters(result, filters);
 
-    if (selectedIngredients.length > 0) {
-      result = result.filter((r) =>
-        r.ingredients.some((ingredient) =>
-          matchesAnySelection(ingredient, normalizedSelectedIngredients)
-        )
-      );
-    }
-
-    if (filters.cuisine) {
-      result = result.filter(r => r.cuisine === filters.cuisine);
-    }
-    if (filters.cookingTime) {
-      const max = cookingTimeMax(filters.cookingTime);
-      result = result.filter(r => r.cookingTime <= max);
-    }
-    if (filters.difficulty) {
-      result = result.filter(r => r.difficulty === filters.difficulty);
-    }
-    if (filters.mealType) {
-      result = result.filter(r => r.mealType === filters.mealType);
-    }
     if (filters.useMostlyMyIngredients && selectedIngredients.length > 0) {
-      result = result.filter(r => {
-        const match = getIngredientMatch(r);
-        return match >= r.ingredients.length * 0.5;
-      });
+      result = result.filter((recipe) => matchesMostlySelectedIngredients(recipe, selectedIngredients));
     }
 
-    const scored = result.map((recipe) => ({
-      recipe,
-      score: scoreRecipe(recipe) + (selectedIngredients.length > 0 ? getIngredientMatch(recipe) * 0.2 : 0),
-    }));
-    scored.sort((a, b) => b.score - a.score);
-
-    return scored.map(({ recipe }) => recipe);
-  }, [selectedIngredients, filters, getIngredientMatch, recipes, normalizedSelectedIngredients, scoreRecipe]);
+    return rankRecipesForPickaMeal(result, {
+      selectedIngredients,
+      preferenceScore: scoreRecipe,
+    });
+  }, [selectedIngredients, filters, recipes, scoreRecipe]);
 
   const getSavedRecipes = useCallback(() => {
     const source = recipes.length ? recipes : getRecipes();

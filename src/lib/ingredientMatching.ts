@@ -1,6 +1,6 @@
 import { sanitizeIngredientName } from "@/lib/apiLoader";
 
-const ingredientCanonicalAliases: Record<string, string> = {
+const ingredientKeyAliases: Record<string, string> = {
   sausage: "sausage",
   sausages: "sausage",
   mussel: "mussels",
@@ -38,7 +38,13 @@ const ingredientCanonicalAliases: Record<string, string> = {
   "minced-beef": "ground-beef",
 };
 
-const generalizeRules: Array<{
+const ingredientMatchingAliases: Record<string, string> = {
+  ...ingredientKeyAliases,
+  egg: "egg",
+  eggs: "egg",
+};
+
+const ingredientKeyRules: Array<{
   canonical: string;
   includes: string[];
   excludes?: string[];
@@ -65,12 +71,34 @@ const generalizeRules: Array<{
   },
 ];
 
-const canonicalizeIngredient = (value: string) => {
+const ingredientMatchingRules: Array<{
+  canonical: string;
+  includes: string[];
+  excludes?: string[];
+}> = [
+  ...ingredientKeyRules,
+  {
+    canonical: "chicken",
+    includes: ["chicken"],
+    excludes: ["broth", "stock", "sauce"],
+  },
+  {
+    canonical: "tomato",
+    includes: ["tomato"],
+    excludes: ["sauce", "paste"],
+  },
+];
+
+const canonicalizeIngredient = (
+  value: string,
+  aliases: Record<string, string>,
+  rules: Array<{ canonical: string; includes: string[]; excludes?: string[] }>
+) => {
   const sanitized = sanitizeIngredientName(value);
   if (!sanitized) return "";
-  const alias = ingredientCanonicalAliases[sanitized];
+  const alias = aliases[sanitized];
   if (alias) return alias;
-  for (const rule of generalizeRules) {
+  for (const rule of rules) {
     const matchesInclude = rule.includes.some((keyword) => sanitized.includes(keyword));
     if (!matchesInclude) continue;
     const hasExcluded = rule.excludes?.some((keyword) => sanitized.includes(keyword));
@@ -80,10 +108,17 @@ const canonicalizeIngredient = (value: string) => {
   return sanitized;
 };
 
-export const normalizeForMatching = (value: string) => canonicalizeIngredient(value);
+export const normalizeForIngredientKey = (value: string) =>
+  canonicalizeIngredient(value, ingredientKeyAliases, ingredientKeyRules);
+
+export const normalizeForMatching = (value: string) =>
+  canonicalizeIngredient(value, ingredientMatchingAliases, ingredientMatchingRules);
 
 export const normalizeSelectionList = (ingredients: string[]) =>
-  ingredients.map(normalizeForMatching).filter(Boolean);
+  Array.from(new Set(ingredients.map(normalizeForMatching).filter(Boolean)));
+
+export const getNormalizedIngredientSet = (ingredients: string[]) =>
+  new Set(normalizeSelectionList(ingredients));
 
 export const matchesNormalizedValues = (normalizedValue: string, normalizedSelection: string) => {
   if (!normalizedValue || !normalizedSelection) return false;
