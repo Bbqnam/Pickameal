@@ -50,9 +50,9 @@ const PROFILE_STORAGE_KEY = "pickameal-taste-profile";
 const ONBOARDING_STORAGE_KEY = "pickameal-onboarding-complete";
 
 const defaultTasteProfile: TasteProfile = {
-  cuisines: {},
-  mealTypes: {},
-  difficulties: {},
+  cuisines: { Asian: 0, Vietnamese: 0, Korean: 0, Chinese: 0, Thai: 0, Japanese: 0, Western: 0, Mexican: 0, Italian: 0, "Middle Eastern": 0, Mediterranean: 0 },
+  mealTypes: { Breakfast: 0, Lunch: 0, Dinner: 0, Snack: 0 },
+  difficulties: { Easy: 0, Medium: 0, Hard: 0 },
   cookingTimes: {
     Quick: 0,
     Balanced: 0,

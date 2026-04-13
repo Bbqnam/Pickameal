@@ -12,11 +12,11 @@ import RecipeProgressBar from "@/components/RecipeProgressBar";
 
 const categories: IngredientCategory[] = ["Protein", "Vegetables", "Carbs", "Extras"];
 
-const categoryEmoji: Record<IngredientCategory, string> = {
-  Protein: "🥩",
-  Vegetables: "🥬",
-  Carbs: "🍚",
-  Extras: "🧂",
+const categoryImage: Record<IngredientCategory, string> = {
+  Protein: "/categories/protein.jpg",
+  Vegetables: "/categories/vegetables.jpg",
+  Carbs: "/categories/carbs.jpg",
+  Extras: "/categories/extras.jpg",
 };
 
 const categoryDescription: Record<IngredientCategory, string> = {
