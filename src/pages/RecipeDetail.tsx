@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useApp } from "@/context/AppContext";
 import { ArrowLeft, Heart, Clock, ChefHat, Check, Circle } from "lucide-react";
 import { matchesAnySelection, normalizeSelectionList } from "@/lib/ingredientMatching";
+import PageShell from "@/components/PageShell";
 
 const RecipeDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,7 +47,7 @@ const RecipeDetail = () => {
   const instructionSteps = recipe.instructions.filter((step) => step.trim().length > 0);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <PageShell noPadding className="bg-background">
       {/* Hero image */}
       <div className="relative">
         <img src={recipe.image} alt={recipe.title} loading="lazy" className="w-full h-80 object-cover" />
@@ -149,7 +150,7 @@ const RecipeDetail = () => {
           </div>
         </section>
       </div>
-    </div>
+    </PageShell>
   );
 };
 

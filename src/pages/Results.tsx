@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useApp } from "@/context/AppContext";
 import RecipeCard from "@/components/RecipeCard";
 import { Shuffle, ArrowLeft, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
+import PageShell from "@/components/PageShell";
 
 const RECIPES_PER_PAGE = 12;
 
@@ -58,7 +59,7 @@ const Results = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <PageShell noPadding className="bg-background">
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border px-4 pt-6 pb-4">
         <div className="flex items-center gap-3 mb-3">
           <button onClick={() => navigate(-1)} className="text-muted-foreground btn-press">
@@ -175,7 +176,7 @@ const Results = () => {
           </div>
         </div>
       )}
-    </div>
+    </PageShell>
   );
 };
 

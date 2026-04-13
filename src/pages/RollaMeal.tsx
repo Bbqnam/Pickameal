@@ -4,6 +4,7 @@ import { Dice3, Sparkles, Repeat, Heart, Compass, Flame, Clock, Gauge, XCircle, 
 import { useApp } from "@/context/AppContext";
 import type { Cuisine, Difficulty, Recipe } from "@/types/recipe";
 import RecipeProgressBar from "@/components/RecipeProgressBar";
+import PageShell from "@/components/PageShell";
 import {
   filterRecipesForRollaMeal,
   type RollaMealFilterState,
@@ -351,7 +352,7 @@ const RollaMeal = () => {
   const slotPreview = slotRecipes.slice(0, SLOT_COUNT);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <PageShell noPadding className="bg-background">
       <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
           <Dice3 className="w-5 h-5 text-primary" />
@@ -712,7 +713,7 @@ const RollaMeal = () => {
           </div>
         </div>
       )}
-    </div>
+    </PageShell>
   );
 };
 
