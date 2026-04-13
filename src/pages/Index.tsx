@@ -28,12 +28,6 @@ const heroActions = [
   },
 ];
 
-const floatingSprites = [
-  { emoji: "🥑", className: "left-[6%] top-[9%] text-[2.6rem]", delay: "0s", duration: "7.2s" },
-  { emoji: "🍕", className: "right-[5%] top-[7%] text-[2.8rem]", delay: "0.8s", duration: "6.6s" },
-  { emoji: "🌮", className: "left-[7%] bottom-[18%] text-[2.1rem]", delay: "0.4s", duration: "7s" },
-  { emoji: "🍜", className: "right-[8%] bottom-[16%] text-[2.15rem]", delay: "1.7s", duration: "7.4s" },
-];
 
 const baseFilters: Filters = {
   cuisine: null,
@@ -59,30 +53,23 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fdfcf8] via-[#fffdef] to-[#eefef2] text-foreground">
       <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8">
-        <section className="relative -mx-4 overflow-hidden bg-gradient-to-b from-[#f7fff6] via-[#fbfff8] to-[#fff7ef] sm:-mx-6 lg:-mx-8">
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/15 via-transparent to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#d6ffe3] to-transparent blur-3xl" />
-          {floatingSprites.map((sprite) => (
-            <span
-              key={sprite.emoji}
-              className={`pointer-events-none absolute select-none leading-none drop-shadow-[0_10px_18px_rgba(15,23,42,0.18)] animate-hero-sprite ${sprite.className}`}
-              style={{ animationDelay: sprite.delay, animationDuration: sprite.duration }}
-            >
-              {sprite.emoji}
-            </span>
-          ))}
-
-          <div className="relative flex min-h-[300px] flex-col items-center gap-1 px-5 pt-7 pb-4 text-center sm:min-h-[360px] sm:px-8 sm:pt-8 sm:pb-5">
-            <div className="relative w-full">
-              <div className="pointer-events-none absolute inset-x-[12%] bottom-[10%] top-[16%] rounded-full bg-white/25 blur-3xl" />
+        <section className="relative -mx-4 overflow-hidden sm:-mx-6 lg:-mx-8">
+          <div className="relative min-h-[300px] sm:min-h-[360px]">
+            <img
+              src="/hero-food.jpg"
+              alt="Delicious food spread"
+              className="absolute inset-0 h-full w-full object-cover"
+              width={1024}
+              height={768}
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-[#fdfcf8]" />
+            <div className="relative flex h-full min-h-[300px] flex-col items-center justify-end gap-1 px-5 pb-6 text-center sm:min-h-[360px] sm:px-8 sm:pb-8">
               <img
                 src="/logo.png"
                 alt="PickaMeal logo"
-                className="animate-hero-logo relative mx-auto w-full max-w-[330px] object-contain drop-shadow-[0_14px_22px_rgba(15,23,42,0.14)] sm:max-w-[380px]"
+                className="animate-hero-logo mx-auto w-full max-w-[260px] object-contain drop-shadow-[0_14px_22px_rgba(15,23,42,0.3)] sm:max-w-[300px]"
               />
-            </div>
-            <div className="space-y-1 px-4 -mt-10 sm:-mt-12">
-              <p className="text-[13px] font-semibold uppercase tracking-[0.28em] text-foreground/55 sm:text-[14px] sm:tracking-[0.32em]">
+              <p className="text-[13px] font-semibold uppercase tracking-[0.28em] text-white/90 drop-shadow-sm sm:text-[14px] sm:tracking-[0.32em]">
                 Meals in minutes
               </p>
             </div>
