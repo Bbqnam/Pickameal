@@ -28,12 +28,6 @@ const heroActions = [
   },
 ];
 
-const floatingSprites = [
-  { emoji: "🥑", className: "left-[6%] top-[9%] text-[2.6rem]", delay: "0s", duration: "7.2s" },
-  { emoji: "🍕", className: "right-[5%] top-[7%] text-[2.8rem]", delay: "0.8s", duration: "6.6s" },
-  { emoji: "🌮", className: "left-[7%] bottom-[18%] text-[2.1rem]", delay: "0.4s", duration: "7s" },
-  { emoji: "🍜", className: "right-[8%] bottom-[16%] text-[2.15rem]", delay: "1.7s", duration: "7.4s" },
-];
 
 const baseFilters: Filters = {
   cuisine: null,
