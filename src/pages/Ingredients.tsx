@@ -360,7 +360,7 @@ const Ingredients = () => {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-    </div>
+    </PageShell>
   );
 };
 
