@@ -65,7 +65,7 @@ const getIngredientPlaceholderEmoji = (name: string, category: IngredientCategor
   if (normalized.includes("butter")) return "🧈";
   if (normalized.includes("lemon")) return "🍋";
   if (normalized.includes("herb") || normalized.includes("basil") || normalized.includes("mint")) return "🌿";
-  return categoryEmoji[category];
+  return "🍽️";
 };
 
 const Ingredients = () => {
@@ -153,7 +153,7 @@ const Ingredients = () => {
               className="w-full flex items-center gap-4 p-4 rounded-2xl bg-card border border-border/50 shadow-sm btn-press card-hover text-left animate-fade-in-up opacity-0"
               style={{ animationDelay: `${i * 0.08}s` }}
             >
-              <span className="text-3xl">{categoryEmoji[cat]}</span>
+              <img src={categoryImage[cat]} alt={cat} className="w-14 h-14 rounded-xl object-cover" loading="lazy" width={56} height={56} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold text-foreground">{cat}</h3>
@@ -218,7 +218,7 @@ const Ingredients = () => {
         <DrawerContent className="max-h-[85vh]">
           <DrawerHeader className="pb-2">
             <DrawerTitle className="flex items-center gap-3 text-xl">
-              <span className="text-2xl">{activeCategory ? categoryEmoji[activeCategory] : ""}</span>
+              {activeCategory && <img src={categoryImage[activeCategory]} alt={activeCategory} className="w-8 h-8 rounded-lg object-cover" loading="lazy" width={32} height={32} />}
               {activeCategory}
             </DrawerTitle>
             <div className="relative mt-3">
