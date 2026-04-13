@@ -5,6 +5,7 @@ import { Sparkles, Settings, ArrowRight, Heart, Ban, Tags, Layers3, Flame, ScanS
 import type { PreferenceHighlights } from "@/types/preferences";
 import { useApp } from "@/context/AppContext";
 import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import PageShell from "@/components/PageShell";
 
 const SwipeIcon = ({ className = "", ...props }: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" className={`h-5 w-5 ${className}`} {...props}>
@@ -120,7 +121,7 @@ const Profile = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <PageShell noPadding className="bg-background">
       <div className="sticky top-0 z-30 border-b border-border bg-background/95 px-5 py-4 backdrop-blur-sm">
         <div className="flex items-center justify-between gap-4">
           <div>
@@ -368,7 +369,7 @@ const Profile = () => {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-    </div>
+    </PageShell>
   );
 };
 

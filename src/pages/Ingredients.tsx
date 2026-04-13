@@ -9,6 +9,7 @@ import { Search, ArrowRight, X, Check, ChevronRight, ArrowUpDown } from "lucide-
 import { Ingredient, IngredientCategory } from "@/types/recipe";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer";
 import RecipeProgressBar from "@/components/RecipeProgressBar";
+import PageShell from "@/components/PageShell";
 
 const categories: IngredientCategory[] = ["Protein", "Vegetables", "Carbs", "Extras"];
 
@@ -118,7 +119,7 @@ const Ingredients = () => {
     enrichedIngredients.filter((ing) => ing.category === cat && selectedIngredients.includes(ing.name)).length;
 
   return (
-    <div className="min-h-screen bg-background pb-48">
+    <PageShell noPadding className="bg-background">
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border px-4 pt-6 pb-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground">Pick Ingredients</h1>
@@ -359,7 +360,7 @@ const Ingredients = () => {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-    </div>
+    </PageShell>
   );
 };
 

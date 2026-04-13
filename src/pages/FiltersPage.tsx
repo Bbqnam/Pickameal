@@ -4,6 +4,7 @@ import { useApp } from "@/context/AppContext";
 import { Cuisine, CookingTime, Difficulty, MealType, Filters } from "@/types/recipe";
 import { ArrowRight, RotateCcw } from "lucide-react";
 import RecipeProgressBar from "@/components/RecipeProgressBar";
+import PageShell from "@/components/PageShell";
 
 const cuisines: Cuisine[] = [
   "Vietnamese",
@@ -77,7 +78,7 @@ const FiltersPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <PageShell noPadding className="bg-background">
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border px-4 pt-6 pb-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground">Filters</h1>
@@ -171,7 +172,7 @@ const FiltersPage = () => {
           </button>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 };
 

@@ -25,7 +25,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AppProvider>
-          <div className="max-w-lg mx-auto min-h-screen relative scale-[0.92] origin-top">
+          <div className="min-h-[100dvh] relative">
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/ingredients" element={<Ingredients />} />

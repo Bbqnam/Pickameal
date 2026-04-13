@@ -1,6 +1,7 @@
 import { ArrowRight, Shuffle, Zap, Leaf, Sofa } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "@/context/AppContext";
+import PageShell from "@/components/PageShell";
 import type { Filters } from "@/types/recipe";
 
 const moodChips = [
@@ -51,8 +52,8 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#fdfcf8] via-[#fffdef] to-[#eefef2] text-foreground">
-      <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8">
+    <PageShell noPadding className="bg-gradient-to-b from-[hsl(var(--background))] via-[hsl(48,100%,97%)] to-[hsl(140,100%,96%)]">
+      <div className="flex flex-col gap-4 px-4 sm:px-6 lg:px-8">
         <section className="relative -mx-4 overflow-hidden sm:-mx-6 lg:-mx-8">
           <div className="relative min-h-[300px] sm:min-h-[360px]">
             <img
@@ -134,7 +135,7 @@ const Index = () => {
           </div>
         </section>
       </div>
-    </div>
+    </PageShell>
   );
 };
 

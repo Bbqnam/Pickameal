@@ -1,6 +1,7 @@
 import { useApp } from "@/context/AppContext";
 import { useNavigate } from "react-router-dom";
 import { Heart, ArrowRight, Trash2 } from "lucide-react";
+import PageShell from "@/components/PageShell";
 
 const SavedRecipes = () => {
   const { getSavedRecipes, toggleSaved } = useApp();
@@ -8,7 +9,7 @@ const SavedRecipes = () => {
   const saved = getSavedRecipes();
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <PageShell noPadding className="bg-background">
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border px-4 pt-6 pb-4">
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <span className="text-2xl">❤️</span>
@@ -67,7 +68,7 @@ const SavedRecipes = () => {
           ))}
         </div>
       )}
-    </div>
+    </PageShell>
   );
 };
 

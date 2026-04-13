@@ -44,8 +44,8 @@ const BottomNav = () => {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-border">
-      <div className="max-w-lg mx-auto flex items-center justify-around py-2 px-4">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-border pb-[env(safe-area-inset-bottom,0px)]">
+      <div className="mx-auto flex max-w-2xl items-center justify-around px-4 py-2 lg:max-w-4xl">
         {navItems.map(({ icon: Icon, label, path, activeClasses, inactiveClasses }) => {
           const active = location.pathname === path;
           return (
